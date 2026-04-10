@@ -25,6 +25,7 @@ interface EntrantStanding {
   currentDollars: number;
   expectedDollars: number;
   rank: number;
+  firepower: number;
 }
 
 interface DashboardData {
@@ -167,6 +168,7 @@ export default function Dashboard() {
                     <th>Entrant</th>
                     <th className="text-right">Current $</th>
                     <th className="text-right">Expected $</th>
+                    <th className="text-right">Firepower</th>
                     <th>Golfers</th>
                   </tr>
                 </thead>
@@ -190,6 +192,9 @@ export default function Dashboard() {
                       </td>
                       <td className="text-right money text-[var(--blue)]">
                         {formatMoney(s.expectedDollars)}
+                      </td>
+                      <td className="text-right text-[var(--yellow)]">
+                        {(s.firepower * 100).toFixed(1)}%
                       </td>
                       <td className="text-sm text-[var(--muted)]">
                         {s.golfers.map((g) => g.name).join(", ")}
@@ -268,8 +273,9 @@ export default function Dashboard() {
 
             <div className="px-4 py-2 text-xs text-[var(--muted)] border-t border-[var(--border)]">
               Current $ = if tournament ended now. Expected $ ={" "}
-              {data.players[0]?.evMethod || "estimated from live odds"}. Click a
-              row to expand golfer details.
+              {data.players[0]?.evMethod || "estimated from live odds"}.
+              Firepower = combined pre-tournament win probability of picks (higher = using more top players).
+              Click a row to expand golfer details.
             </div>
           </section>
 

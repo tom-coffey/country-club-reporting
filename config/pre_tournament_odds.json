@@ -1,0 +1,30 @@
+{
+  "tournament": "The Masters 2026",
+  "note": "Pre-tournament American odds captured before Round 1. Used for firepower calculation.",
+  "odds": {
+    "Scottie Scheffler": 350,
+    "Xander Schauffele": 600,
+    "Rory McIlroy": 800,
+    "Jon Rahm": 1000,
+    "Bryson DeChambeau": 1200,
+    "Ludvig Aberg": 1400,
+    "Collin Morikawa": 1600,
+    "Brooks Koepka": 2000,
+    "Viktor Hovland": 2500,
+    "Cameron Smith": 2500,
+    "Patrick Cantlay": 3000,
+    "Tommy Fleetwood": 3000,
+    "Hideki Matsuyama": 3500,
+    "Shane Lowry": 3500,
+    "Jordan Spieth": 3500,
+    "Justin Rose": 5000,
+    "Matt Fitzpatrick": 5000,
+    "Tony Finau": 5000,
+    "Cameron Young": 4000,
+    "Akshay Bhatia": 6000,
+    "Min Woo Lee": 6000,
+    "Sahith Theegala": 4000,
+    "Jake Knapp": 8000,
+    "Wyndham Clark": 4000
+  }
+}

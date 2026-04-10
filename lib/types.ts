@@ -45,6 +45,7 @@ export interface EntrantStanding {
   currentDollars: number;
   expectedDollars: number;
   rank: number;
+  firepower: number; // combined implied win % of picks — measures how much "top player capital" is being used
 }
 
 export interface DashboardData {

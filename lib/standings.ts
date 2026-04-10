@@ -1,12 +1,14 @@
 import picks from "@/config/picks.json";
+import preTournamentOddsData from "@/config/pre_tournament_odds.json";
 import { GolferLeaderboard, GolferOdds, GolferPoolData, EntrantStanding, DashboardData } from "./types";
 import { normalizeName } from "./normalizeNames";
 import { calculatePayout } from "./tieLogic";
-import { calculateExpectedDollars } from "./expectedValue";
+import { calculateExpectedDollars, oddsToImpliedProbability } from "./expectedValue";
 import { getLeaderboard } from "./leaderboard";
 import { getLiveOdds } from "./odds";
 
 const poolPicks: Record<string, string[]> = picks;
+const preOdds: Record<string, number> = preTournamentOddsData.odds;
 
 export async function getDashboardData(): Promise<DashboardData> {
   const errors: string[] = [];
@@ -119,11 +121,22 @@ export async function getDashboardData(): Promise<DashboardData> {
       0
     );
 
+    // Firepower: sum of pre-tournament implied win probabilities
+    const firepower = golfers.reduce((sum, g) => {
+      const name = normalizeName(g);
+      const odds = preOdds[name];
+      if (odds !== undefined) {
+        return sum + oddsToImpliedProbability(odds);
+      }
+      return sum;
+    }, 0);
+
     standings.push({
       name: entrant,
       golfers: entrantGolfers,
       currentDollars,
       expectedDollars,
+      firepower,
       rank: 0,
     });
   }
