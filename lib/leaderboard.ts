@@ -1,11 +1,25 @@
 import { GolferLeaderboard } from "./types";
 import { normalizeName } from "./normalizeNames";
 
+interface ESPNLinescoreHole {
+  period: number;
+  displayValue?: string;
+  scoreType?: { displayValue?: string };
+}
+
+interface ESPNLinescore {
+  period: number;
+  value?: number;
+  displayValue?: string;
+  linescores?: ESPNLinescoreHole[];
+}
+
 interface ESPNCompetitor {
   athlete?: { displayName?: string; amateur?: boolean };
   status?: { type?: { name?: string; description?: string } };
-  score?: { displayValue?: string };
-  linescores?: { displayValue?: string }[];
+  score?: string | { displayValue?: string };
+  linescores?: ESPNLinescore[];
+  order?: number;
   sortOrder?: number;
   statistics?: { name?: string; displayValue?: string }[];
 }
@@ -62,18 +76,19 @@ export async function getLeaderboard(): Promise<{
     const competitors: ESPNCompetitor[] = competition.competitors || [];
     const players: GolferLeaderboard[] = [];
 
-    // Build position groups for tie detection
+    // Build position groups for tie detection using order field
     const positionCounts = new Map<number, number>();
     competitors.forEach((c: ESPNCompetitor, i: number) => {
-      const pos = c.sortOrder || i + 1;
+      const pos = c.order ?? c.sortOrder ?? i + 1;
       positionCounts.set(pos, (positionCounts.get(pos) || 0) + 1);
     });
 
     competitors.forEach((c: ESPNCompetitor, i: number) => {
       const rawName = c.athlete?.displayName || `Player ${i + 1}`;
       const name = normalizeName(rawName);
-      const pos = c.sortOrder || i + 1;
+      const pos = c.order ?? c.sortOrder ?? i + 1;
 
+      // Status — ESPN may put it in c.status or we derive from score
       const statusName = c.status?.type?.name?.toLowerCase() || "";
       let status: GolferLeaderboard["status"] = "active";
       if (statusName.includes("cut")) status = "cut";
@@ -81,20 +96,32 @@ export async function getLeaderboard(): Promise<{
       else if (statusName.includes("dq")) status = "dq";
       else if (statusName.includes("complete")) status = "finished";
 
-      const score = c.score?.displayValue || "E";
-      const currentRound = c.linescores?.length || 1;
-      const lastLine = c.linescores?.[currentRound - 1];
-      const today = lastLine?.displayValue || "--";
+      // Score — ESPN returns either a string or an object
+      let score: string;
+      if (typeof c.score === "string") {
+        score = c.score;
+      } else if (c.score && typeof c.score === "object") {
+        score = c.score.displayValue || "E";
+      } else {
+        score = "E";
+      }
 
-      // Determine thru
+      // Find current round and today's score
+      const linescores = c.linescores || [];
+      // Current round = last round with holes played
+      let currentRound = 1;
+      let today = "--";
       let thru = "—";
-      const thruStat = c.statistics?.find(
-        (s: { name?: string }) => s.name === "thru"
-      );
-      if (thruStat) {
-        thru = thruStat.displayValue || "—";
-      } else if (status === "finished" || status === "cut") {
-        thru = "F";
+
+      for (let r = linescores.length - 1; r >= 0; r--) {
+        const round = linescores[r];
+        const holesPlayed = (round.linescores || []).length;
+        if (holesPlayed > 0) {
+          currentRound = round.period || r + 1;
+          today = round.displayValue || "--";
+          thru = holesPlayed >= 18 ? "F" : String(holesPlayed);
+          break;
+        }
       }
 
       const tiedCount = positionCounts.get(pos) || 1;
