@@ -5,7 +5,7 @@ import { normalizeName } from "./normalizeNames";
 let cachedOdds: GolferOdds[] | null = null;
 let cachedTimestamp: string | null = null;
 let lastFetchTime = 0;
-const CACHE_MS = 120_000; // 2 minutes
+const CACHE_MS = 600_000; // 10 minutes — conserves free-tier API quota across multiple majors
 
 export async function getLiveOdds(): Promise<{
   odds: GolferOdds[];
