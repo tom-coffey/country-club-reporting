@@ -165,9 +165,9 @@ export default function Dashboard() {
                   <tr>
                     <th>#</th>
                     <th>Entrant</th>
-                    <th>Golfers</th>
                     <th className="text-right">Current $</th>
                     <th className="text-right">Expected $</th>
+                    <th>Golfers</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -185,14 +185,14 @@ export default function Dashboard() {
                         {s.rank}
                       </td>
                       <td className="font-semibold">{s.name}</td>
-                      <td className="text-sm text-[var(--muted)]">
-                        {s.golfers.map((g) => g.name).join(", ")}
-                      </td>
                       <td className="text-right money money-positive">
                         {formatMoney(s.currentDollars)}
                       </td>
                       <td className="text-right money text-[var(--blue)]">
                         {formatMoney(s.expectedDollars)}
+                      </td>
+                      <td className="text-sm text-[var(--muted)]">
+                        {s.golfers.map((g) => g.name).join(", ")}
                       </td>
                     </tr>
                   ))}
